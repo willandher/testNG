@@ -10,9 +10,8 @@ public class Main {
 
     public static void main(String[] args) throws IOException, ImageWriteException, ImageReadException {
 
-        new WriteExifMetadataExample().changeExifMetadata(new File("photo.jpg"), new File("result_test.jpg"));
-        System.out.println(WriteExifMetadataExample.getExifDate(new File("photo.jpeg")));
+        new WriteExifMetadataExample().changeExifMetadata(new File("IMG_0996.jpeg"), new File("result_test.jpg"));
         System.out.println(WriteExifMetadataExample.getExifDate(new File("result_test.jpg")));
-        MetadataExample.metadataExample(new File("photo.jpeg"));
+        MetadataExample.metadataExample(new File("IMG_0996.jpeg"));
     }
 }

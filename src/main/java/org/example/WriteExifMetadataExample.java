@@ -10,13 +10,20 @@ import org.apache.commons.imaging.formats.tiff.TiffField;
 import org.apache.commons.imaging.formats.tiff.TiffImageMetadata;
 import org.apache.commons.imaging.formats.tiff.constants.ExifTagConstants;
 import org.apache.commons.imaging.formats.tiff.constants.TiffTagConstants;
+import org.apache.commons.imaging.formats.tiff.fieldtypes.FieldType;
 import org.apache.commons.imaging.formats.tiff.taginfos.TagInfo;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputDirectory;
+import org.apache.commons.imaging.formats.tiff.write.TiffOutputField;
 import org.apache.commons.imaging.formats.tiff.write.TiffOutputSet;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 public class WriteExifMetadataExample {
+
+    public static final int DATE_TIME_ORIGINAL = 0x9003;
 
     public void changeExifMetadata(final File jpegImageFile, final File dst)
             throws IOException, ImageReadException, ImageWriteException {
@@ -70,8 +77,25 @@ public class WriteExifMetadataExample {
                 final TiffOutputDirectory exifDirectory = outputSet.getOrCreateExifDirectory();
                 // make sure to remove old value if present (this method will
                 // not fail if the tag does not exist).
+
+                SimpleDateFormat SDF = new SimpleDateFormat("yyyy:MM:dd kk:mm:ss");
+                Calendar calendar = Calendar.getInstance();
+                String updatedDateString = SDF.format(calendar.getTime());
+                System.out.println(updatedDateString);
+
+                FieldType originalFieldType = null;
+                TagInfo originalTagInfo = null;
+                TiffOutputField dateTimeFieldOriginal = exifDirectory.findField(DATE_TIME_ORIGINAL); // DateTimeOriginal
+                if (dateTimeFieldOriginal != null) {
+                    originalFieldType = dateTimeFieldOriginal.fieldType;
+                    originalTagInfo = dateTimeFieldOriginal.tagInfo;
+                }
+                final TiffOutputField dateTimeOutputField = new TiffOutputField(originalTagInfo, originalFieldType, updatedDateString.length(), updatedDateString.getBytes());
                 exifDirectory.removeField(ExifTagConstants.EXIF_TAG_APERTURE_VALUE);
                 exifDirectory.removeField(306);
+                exifDirectory.removeField(DATE_TIME_ORIGINAL);
+                exifDirectory.add(dateTimeOutputField);
+
                 exifDirectory.add(ExifTagConstants.EXIF_TAG_APERTURE_VALUE,
                         new RationalNumber(3, 10));
             }
